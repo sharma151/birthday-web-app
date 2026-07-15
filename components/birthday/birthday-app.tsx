@@ -14,6 +14,21 @@ import { GiftScratchCard } from "./phases/gift-scratch-card"
 
 const TOTAL_STEPS = 7
 
+const BACKGROUND_EMOJIS = [
+  { emoji: '💖', top: '10%', left: '10%', delay: 0 },
+  { emoji: '🎉', top: '15%', left: '80%', delay: 1 },
+  { emoji: '✨', top: '40%', left: '8%', delay: 0.5 },
+  { emoji: '🌟', top: '35%', left: '88%', delay: 2 },
+  { emoji: '🎈', top: '75%', left: '12%', delay: 1.5 },
+  { emoji: '🥰', top: '80%', left: '85%', delay: 0.2 },
+  { emoji: '👯‍♀️', top: '25%', left: '30%', delay: 2.5 },
+  { emoji: '💝', top: '20%', left: '60%', delay: 0.8 },
+  { emoji: '🎂', top: '85%', left: '40%', delay: 1.2 },
+  { emoji: '🥳', top: '60%', left: '82%', delay: 1.8 },
+  { emoji: '🥂', top: '5%', left: '45%', delay: 0.4 },
+  { emoji: '💐', top: '65%', left: '25%', delay: 0.9 },
+]
+
 function Flow() {
   const [step, setStep] = useState(1)
   const { startMusic } = useAudio()
@@ -30,7 +45,7 @@ function Flow() {
       {/* Ambient gradient wash */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10"
+        className="pointer-events-none absolute inset-0 z-0"
         style={{
           background:
             "radial-gradient(circle at 15% 20%, oklch(0.9 0.08 350 / 0.55), transparent 45%)," +
@@ -39,6 +54,29 @@ function Flow() {
             "radial-gradient(circle at 20% 90%, oklch(0.88 0.1 300 / 0.4), transparent 45%)",
         }}
       />
+
+      {/* Floating background emojis */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-40">
+        {BACKGROUND_EMOJIS.map((item, i) => (
+          <motion.div
+            key={i}
+            className="absolute text-4xl sm:text-5xl drop-shadow-md grayscale-[20%]"
+            style={{ top: item.top, left: item.left }}
+            animate={{ 
+              y: [0, -20, 0],
+              rotate: [-5, 5, -5]
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: item.delay
+            }}
+          >
+            {item.emoji}
+          </motion.div>
+        ))}
+      </div>
 
       <ControlTray />
 
