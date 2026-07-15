@@ -1,32 +1,42 @@
-"use client"
+"use client";
 
-import { useRef, useState } from "react"
-import { motion, useAnimationControls } from "framer-motion"
-import { Lock, Sparkles } from "lucide-react"
+import { useRef, useState } from "react";
+import { motion, useAnimationControls } from "framer-motion";
+import { Lock, Sparkles } from "lucide-react";
 
-const CORRECT_CODE = "1234"
+const CORRECT_CODE = "1234";
+
+const HINTS = [
+  "Try again! Think a bit, what could it be? 💫",
+  "I thought you were that close! 😅",
+  "Ok, take a hint: It's your friend's birthdate from class 11 🎂",
+  "Hint 4: [Update this placeholder message] 🧐",
+  "Hint 5: [Update this placeholder message] 🆘"
+];
 
 export function LoginPortal({ onSuccess }: { onSuccess: () => void }) {
-  const [code, setCode] = useState("")
-  const [error, setError] = useState(false)
-  const controls = useAnimationControls()
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [code, setCode] = useState("");
+  const [error, setError] = useState(false);
+  const [attemptCount, setAttemptCount] = useState(0);
+  const controls = useAnimationControls();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const submit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (code === CORRECT_CODE) {
-      setError(false)
-      onSuccess()
+      setError(false);
+      onSuccess();
     } else {
-      setError(true)
-      setCode("")
+      setAttemptCount((prev) => prev + 1);
+      setError(true);
+      setCode("");
       controls.start({
         x: [0, -12, 12, -10, 10, -6, 6, 0],
         transition: { duration: 0.5 },
-      })
-      inputRef.current?.focus()
+      });
+      inputRef.current?.focus();
     }
-  }
+  };
 
   return (
     <motion.div
@@ -35,7 +45,11 @@ export function LoginPortal({ onSuccess }: { onSuccess: () => void }) {
     >
       <motion.div
         animate={{ scale: [1, 1.05, 1], rotate: [0, 2, -2, 0] }}
-        transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+        transition={{
+          duration: 4,
+          repeat: Number.POSITIVE_INFINITY,
+          ease: "easeInOut",
+        }}
         className="mx-auto md:mx-0 flex shrink-0 size-32 md:size-64 items-center justify-center overflow-hidden rounded-full border-4 border-primary/20 bg-primary/10 shadow-lg"
       >
         {/* 💡 UPDATE THE src BELOW TO CHANGE THE TOP IMAGE */}
@@ -66,14 +80,16 @@ export function LoginPortal({ onSuccess }: { onSuccess: () => void }) {
               value={code}
               autoFocus
               onChange={(e) => {
-                setError(false)
-                setCode(e.target.value.replace(/\D/g, ""))
+                setError(false);
+                setCode(e.target.value.replace(/\D/g, ""));
               }}
               placeholder="••••"
               aria-label="4 digit code"
               aria-invalid={error}
               className={`w-full rounded-2xl border-2 bg-background/70 py-3.5 pl-12 pr-4 text-center md:text-left text-2xl font-bold tracking-[0.5em] text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 ${
-                error ? "border-destructive" : "border-border focus:border-primary"
+                error
+                  ? "border-destructive"
+                  : "border-border focus:border-primary"
               }`}
             />
           </div>
@@ -85,12 +101,12 @@ export function LoginPortal({ onSuccess }: { onSuccess: () => void }) {
               className="flex flex-col items-center md:items-start gap-3"
             >
               <p className="text-sm font-bold text-destructive">
-                Oops! That&apos;s not the magic code. Try again 💫
+                {HINTS[Math.min(Math.max(0, attemptCount - 1), HINTS.length - 1)]}
               </p>
               {/* 💡 UPDATE THE src BELOW TO CHANGE THE SAD GIF */}
-              <img 
-                src="https://media.giphy.com/media/OPU6wzx8JlNyc/giphy.gif" 
-                alt="Sad face" 
+              <img
+                src="https://media.giphy.com/media/OPU6wzx8JlNyc/giphy.gif"
+                alt="Sad face"
                 className="h-24 md:h-28 w-auto rounded-xl shadow-sm border border-border/50"
               />
             </motion.div>
@@ -102,9 +118,9 @@ export function LoginPortal({ onSuccess }: { onSuccess: () => void }) {
           >
             Unlock the magic
           </button>
-          <p className="text-xs font-semibold text-muted-foreground/70">psst… the code is 1234</p>
+          {/* <p className="text-xs font-semibold text-muted-foreground/70">psst… the code is 1234</p> */}
         </form>
       </div>
     </motion.div>
-  )
+  );
 }

@@ -11,8 +11,10 @@ import { NostalgiaQuiz } from "./phases/nostalgia-quiz"
 import { CakeCeremony } from "./phases/cake-ceremony"
 import { MemoryChronicle } from "./phases/memory-chronicle"
 import { GiftScratchCard } from "./phases/gift-scratch-card"
+import { PreCakeWishes } from "./phases/pre-cake-wishes"
+import { MatrixLoader } from "./phases/matrix-loader"
 
-const TOTAL_STEPS = 7
+const TOTAL_STEPS = 8
 
 const BACKGROUND_EMOJIS = [
   { emoji: '💖', top: '10%', left: '10%', delay: 0 },
@@ -30,6 +32,7 @@ const BACKGROUND_EMOJIS = [
 ]
 
 function Flow() {
+  const [showLoader, setShowLoader] = useState(true)
   const [step, setStep] = useState(1)
   const { startMusic } = useAudio()
 
@@ -38,6 +41,10 @@ function Flow() {
   const handleUnlock = () => {
     startMusic()
     next()
+  }
+
+  if (showLoader) {
+    return <MatrixLoader onComplete={() => setShowLoader(false)} />
   }
 
   return (
@@ -109,9 +116,10 @@ function Flow() {
           {step === 2 && <EvasiveInquiry onYes={next} />}
           {step === 3 && <BalloonGame onComplete={next} />}
           {step === 4 && <NostalgiaQuiz onComplete={next} />}
-          {step === 5 && <CakeCeremony onComplete={next} />}
-          {step === 6 && <MemoryChronicle onComplete={next} />}
-          {step === 7 && <GiftScratchCard />}
+          {step === 5 && <PreCakeWishes onNext={next} />}
+          {step === 6 && <CakeCeremony onComplete={next} />}
+          {step === 7 && <MemoryChronicle onComplete={next} />}
+          {step === 8 && <GiftScratchCard />}
         </motion.div>
       </AnimatePresence>
     </main>
