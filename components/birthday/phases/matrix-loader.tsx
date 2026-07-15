@@ -1,91 +1,99 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 // 💡 UPDATE THIS NAME TO THE BIRTHDAY PERSON'S NAME
-const USER_NAME = "ALICE" 
-const MATRIX_TEXT = `HAPPYBIRTHDAY${USER_NAME}`
+const USER_NAME = "Saurav ";
+const MATRIX_TEXT = `HAPPY BIRTHDAY ${USER_NAME}`;
 
 export function MatrixLoader({ onComplete }: { onComplete: () => void }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [count, setCount] = useState(4)
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [count, setCount] = useState(4);
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    let animationFrameId: number
-    let lastTime = 0
+    let animationFrameId: number;
+    let lastTime = 0;
 
     // Set canvas size
     const resize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-    }
-    resize()
-    window.addEventListener("resize", resize)
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
 
-    const fontSize = 18
-    const columns = Math.floor(canvas.width / fontSize) + 1
-    const drops: number[] = Array(columns).fill(0).map(() => Math.random() * -100)
+    const fontSize = 18;
+    const columns = Math.floor(canvas.width / fontSize) + 1;
+    const drops: number[] = Array(columns)
+      .fill(0)
+      .map(() => Math.random() * -100);
 
     const draw = (time: number) => {
-      // Target ~30 fps
-      if (time - lastTime < 33) {
-        animationFrameId = requestAnimationFrame(draw)
-        return
+      // Target ~12 fps for a slower, more readable matrix fall
+      if (time - lastTime < 80) {
+        animationFrameId = requestAnimationFrame(draw);
+        return;
       }
-      lastTime = time
+      lastTime = time;
 
       // Translucent dark background creates the trailing effect
-      ctx.fillStyle = "rgba(10, 5, 10, 0.15)"
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.fillStyle = "rgba(10, 5, 10, 0.15)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Matrix text color (Pink to match theme)
-      ctx.fillStyle = "#ff2d9a"
-      ctx.font = `bold ${fontSize}px monospace`
-      ctx.textAlign = "center"
+      ctx.fillStyle = "#ff2d9a";
+      ctx.font = `bold ${fontSize}px monospace`;
+      ctx.textAlign = "center";
 
       for (let i = 0; i < drops.length; i++) {
-        const text = MATRIX_TEXT.charAt(Math.floor(Math.random() * MATRIX_TEXT.length))
-        const x = i * fontSize
-        const y = drops[i] * fontSize
+        // Calculate the current letter index based on the vertical drop position
+        // This ensures the words are spelled correctly from top to bottom
+        let textIndex = Math.floor(drops[i]) % MATRIX_TEXT.length;
+        if (textIndex < 0) textIndex += MATRIX_TEXT.length; // handle negative initial drops
 
-        ctx.fillText(text, x, y)
+        const text = MATRIX_TEXT.charAt(textIndex);
+
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+
+        ctx.fillText(text, x, y);
 
         if (y > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0
+          drops[i] = 0;
         }
-        drops[i]++
+        drops[i]++;
       }
-      animationFrameId = requestAnimationFrame(draw)
-    }
+      animationFrameId = requestAnimationFrame(draw);
+    };
 
-    animationFrameId = requestAnimationFrame(draw)
+    animationFrameId = requestAnimationFrame(draw);
 
     return () => {
-      window.removeEventListener("resize", resize)
-      cancelAnimationFrame(animationFrameId)
-    }
-  }, [])
+      window.removeEventListener("resize", resize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCount((prev) => {
         if (prev <= 1) {
-          clearInterval(timer)
-          setTimeout(onComplete, 400) // slight delay before switching
-          return 0
+          clearInterval(timer);
+          setTimeout(onComplete, 400); // slight delay before switching
+          return 0;
         }
-        return prev - 1
-      })
-    }, 1000)
+        return prev - 1;
+      });
+    }, 1000);
 
-    return () => clearInterval(timer)
-  }, [onComplete])
+    return () => clearInterval(timer);
+  }, [onComplete]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0a050a]">
@@ -106,5 +114,5 @@ export function MatrixLoader({ onComplete }: { onComplete: () => void }) {
         )}
       </AnimatePresence>
     </div>
-  )
+  );
 }
